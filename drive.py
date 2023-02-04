@@ -14,7 +14,7 @@ SPEED = 20
 
 def ultrasonic_sensor_scan(us_queue: Queue):
     while True:
-        scan = fc.scan_step(35)
+        scan = scan_step(35, 3)
         if scan:
             print(scan)
         if scan and len(scan) >= 10:
