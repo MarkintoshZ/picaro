@@ -66,24 +66,23 @@ def get_line_status(threshold: int = 400) -> Tuple[bool, bool, bool]:
 
 
 def scan_step(ref1: int, ref2: int):
-    global scan_list, current_angle, us_step
     fc.current_angle += fc.us_step
     if fc.current_angle >= fc.max_angle:
-        current_angle = fc.max_angle
-        us_step = -fc.STEP
+        fc.current_angle = fc.max_angle
+        fc.us_step = -fc.STEP
     elif fc.current_angle <= fc.min_angle:
-        current_angle = fc.min_angle
-        us_step = fc.STEP
-    status = fc.get_status_at(current_angle, ref1=ref1, ref2=ref2)#ref1
+        fc.current_angle = fc.min_angle
+        fc.us_step = fc.STEP
+    status = fc.get_status_at(fc.current_angle, ref1=ref1, ref2=ref2)#ref1
 
     fc.scan_list.append(status)
-    if current_angle == fc.min_angle or current_angle == fc.max_angle:
-        if us_step < 0:
+    if fc.current_angle == fc.min_angle or fc.current_angle == fc.max_angle:
+        if fc.us_step < 0:
             # print("reverse")
             fc.scan_list.reverse()
         # print(scan_list)
         tmp = fc.scan_list.copy()
-        scan_list = []
+        fc.scan_list = []
         return tmp
     else:
         return False
