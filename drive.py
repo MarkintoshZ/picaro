@@ -26,7 +26,7 @@ def find_new_direction(us_queue: Queue):
     while True:
         if us_queue.not_empty:
             scan: List[int] = us_queue.get()
-            if min(scan[3:7]) == 2:
+            if sum(scan[3:7]) / 4 >= 1.3:
                 break
         sleep(0.1)
     drive(Command.STOP)
@@ -43,17 +43,17 @@ def main():
         # get driving direction based on ultrasonic sensor
         if us_queue.not_empty:
             scan: List[int] = us_queue.get()
-            left = min(scan[3:6])
-            right = min(scan[5:8])
-            if left > right and left == 0:
+            left = sum(scan[3:6]) / 3
+            right = sum(scan[5:8]) / 3
+            if left > right and left <= 0.5:
                 us_direction = -2
             elif left > right:
                 us_direction = -1
-            elif left < right and right == 0:
+            elif left < right and right <= 0.5:
                 us_direction = 1
             elif left < right:
                 us_direction = 2
-            elif left == 0 and right == 0:
+            elif left <= 0.3 and right == 0.3:
                 find_new_direction(us_queue)
 
         # get driving direction based on grayscale sensor
