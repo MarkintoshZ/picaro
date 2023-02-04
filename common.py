@@ -42,15 +42,16 @@ def drive(cmd: Command, speed: int = 20) -> None:
     """Execute driving command by setting motor speed"""
     if cmd == Command.STOP:
         fc.stop()
-    func = {
-        Command.FORWARD: fc.forward,
-        Command.BACKWARD: fc.backward,
-        Command.LEFT_SPIN: fc.turn_left,
-        Command.LEFT_TURN: left_turn,
-        Command.RIGHT_SPIN: fc.turn_right,
-        Command.RIGHT_TURN: right_turn,
-    }[cmd]
-    func(speed)
+    else:
+        func = {
+            Command.FORWARD: fc.forward,
+            Command.BACKWARD: fc.backward,
+            Command.LEFT_SPIN: fc.turn_left,
+            Command.LEFT_TURN: left_turn,
+            Command.RIGHT_SPIN: fc.turn_right,
+            Command.RIGHT_TURN: right_turn,
+        }[cmd]
+        func(speed)
 
 
 def get_line_status(threshold: int = 400) -> Tuple[bool, bool, bool]:
