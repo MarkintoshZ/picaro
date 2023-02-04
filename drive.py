@@ -16,6 +16,8 @@ def ultrasonic_sensor_scan(us_queue: Queue):
     while True:
         scan = fc.scan_step(35)
         if scan:
+            print(scan)
+        if scan and len(scan) >= 10:
             us_queue.put(scan)
 
 
