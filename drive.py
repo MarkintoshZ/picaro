@@ -22,7 +22,7 @@ def ultrasonic_sensor_scan(us_queue: Queue):
 
 
 def find_new_direction(us_queue: Queue):
-    drive(Command.RIGHT_SPIN, SPEED)
+    drive(Command.RIGHT_SPIN, round(SPEED / 4))
     while True:
         if us_queue.not_empty:
             scan: List[int] = us_queue.get()
