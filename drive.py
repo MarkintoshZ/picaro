@@ -28,7 +28,6 @@ def find_new_direction(us_queue: Queue):
             scan: List[int] = us_queue.get()
             if sum(scan[3:7]) / 4 >= 1.3:
                 break
-        sleep(0.1)
     drive(Command.STOP)
             
 
