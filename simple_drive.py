@@ -1,6 +1,8 @@
 import picar_4wd as fc
 
+
 speed = 30
+
 
 def scan_step():
     fc.current_angle += fc.us_step
@@ -10,7 +12,7 @@ def scan_step():
     elif fc.current_angle <= fc.min_angle:
         fc.current_angle = fc.min_angle
         fc.us_step = fc.STEP
-    dist = fc.get_distance_at(fc.current_anglex)
+    dist = fc.get_distance_at(fc.current_angle)
 
     fc.scan_list.append(dist)
     if fc.current_angle == fc.min_angle or fc.current_angle == fc.max_angle:
@@ -21,7 +23,6 @@ def scan_step():
         return tmp
     else:
         return False
-
 
 
 def main():
@@ -45,6 +46,7 @@ def main():
             fc.left_rear.set_power(speed - diff)
             fc.right_front.set_power(speed + diff)
             fc.right_rear.set_power(speed + diff)
+
 
 if __name__ == "__main__":
     try: 
