@@ -8,7 +8,7 @@ SPEED = 10
 
 def main():
     while True:
-        if [fc.get_status_at(-15), fc.get_status_at(15)] != [2, 2]:
+        if [fc.get_status_at(-15), fc.get_status_at(15)] == [2, 2]:
             drive(Command.FORWARD, SPEED)
         else:
             drive(Command.STOP)
