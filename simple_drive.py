@@ -26,7 +26,7 @@ def scan_step():
 
 def main():
     while True:
-        scan_list = fc.scan_step(35)
+        scan_list = scan_step()
         if not scan_list:
             continue
 
