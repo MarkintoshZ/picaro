@@ -72,7 +72,7 @@ class Car:
 
     def turn_absolute(self, dir_in_rad: float):
         diff = dir_in_rad - self.curr_dir
-        self.turn_relative(math.copysign(abs(diff), math.sin(diff)))
+        self.turn_relative(math.copysign(abs(diff % math.pi), math.sin(diff)))
 
     def turn_absolute_deg(self, dir_in_deg: float):
         self.turn_absolute(math.radians(dir_in_deg))
