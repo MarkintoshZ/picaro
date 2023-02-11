@@ -1,10 +1,11 @@
 import numpy as np
-from typing import NamedTuple, Iterable
+from typing import NamedTuple, Tuple
+
 
 Ray = NamedTuple(
     "Ray",
     [
-        ('origin', Iterable),
+        ('origin', Tuple[int, int]),
         ('angle', float),
         ('dist', int),
     ])
@@ -29,7 +30,7 @@ class Mapper:
         self.data = np.ones((size, size)) * Mapper.UNKNOWN
         self.rays = []
 
-    def add_ray(self, ray: Ray):
+    def add_ray(self, ray: Ray) -> None:
         x, y = np.array(ray.origin).round().astype(int)
         self.data[y, x] = 0
         if self.rays:
@@ -40,7 +41,9 @@ class Mapper:
                             ray.origin[1] + np.sin(ray.angle) * ray.dist)
             self.shade_triangle(last_ray.origin, ray.origin, last_ray_end)
             self.shade_triangle(last_ray.origin, ray.origin, this_ray_end)
-            if np.linalg.norm(np.array(last_ray_end) - np.array(this_ray_end)) < self.connect_cutoff:
+            end_point_dist = np.linalg.norm(
+                    np.array(last_ray_end) - np.array(this_ray_end)) # type: ignore
+            if end_point_dist < self.connect_cutoff:
                 self.shade_triangle(
                     last_ray.origin, this_ray_end, last_ray_end)
                 if max(ray.dist, last_ray.dist) < self.dist_cutoff:
@@ -48,7 +51,7 @@ class Mapper:
                     self.draw_line(this_ray_end, last_ray_end)
         self.rays.append(ray)
 
-    def shade_triangle(self, p1, p2, p3):
+    def shade_triangle(self, p1, p2, p3) -> None:
         """Clear the area inside the triangle defined by the three points"""
         p1 = np.array(p1)
         p2 = np.array(p2)
@@ -68,7 +71,7 @@ class Mapper:
                 if inside:
                     self.data[y, x] = Mapper.EMPTY
 
-    def is_inside_triangle(self, p1, p2, p3, p):
+    def is_inside_triangle(self, p1, p2, p3, p) -> bool:
         """Check if a point is inside a triangle"""
         v0 = p3 - p1
         v1 = p2 - p1
@@ -86,7 +89,7 @@ class Mapper:
 
         return (u >= 0) and (v >= 0) and (u + v < 1)
 
-    def draw_line(self, p1, p2):
+    def draw_line(self, p1, p2) -> None:
         """Draw a line between two points"""
         p1 = np.array(p1)
         p2 = np.array(p2)
@@ -104,11 +107,11 @@ class Mapper:
                 if self.is_on_line(p1, p2, (x, y)):
                     self.data[y, x] = Mapper.FILLED
 
-    def is_on_line(self, p1, p2, p):
+    def is_on_line(self, p1, p2, p) -> bool:
         """Check if a point is on a line"""
         return np.linalg.norm(np.cross(p2 - p1, p1 - p)) / np.linalg.norm(p2 - p1) < 0.5
 
-    def __str__(self):
+    def __str__(self) -> str:
         s = ''
         for row in self.data:
             for block in row:
@@ -121,7 +124,7 @@ class Mapper:
             s += '\n'
         return s
 
-    def plot(self, show=True, save_file=None):
+    def plot(self, show=True, save_file=None) -> None:
         import matplotlib.pyplot as plt
 
         plt.figure(dpi=400)
@@ -133,7 +136,7 @@ class Mapper:
             plt.arrow(x + 0.5, y + 0.5, dx, dy, color='g', width=0.01,
                       head_width=0.05, head_length=0.02)
 
-        plt.gca().set_aspect('equal')
+        plt.gca().set_aspect('equal')  # type: ignore
 
         if save_file and isinstance(save_file, str):
             plt.savefig(save_file, dpi=300)

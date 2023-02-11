@@ -63,7 +63,7 @@ class Car:
         else:
             fc.turn_right(self._SPEED)
 
-        time.sleep(angle_in_rad * self._TURN_SCALER)
+        time.sleep(abs(angle_in_rad) * self._TURN_SCALER)
         fc.stop()
         time.sleep(0.5)
 
