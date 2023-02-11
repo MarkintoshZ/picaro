@@ -8,9 +8,10 @@ print(f'Speed = 10')
 for i in range(10):
     dist = fc.get_distance_at(0)
     fc.forward(SPEED)
-    sleep(0.1)
+    sleep(0.2)
     fc.stop()
     print(f'i = {i} dist = {dist}')
+    sleep(1)
 
 
 fc.turn_left(SPEED)
