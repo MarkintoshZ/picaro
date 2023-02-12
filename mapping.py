@@ -95,7 +95,7 @@ class Car:
 
 
 def main():
-    MAP_SIZE = 300
+    MAP_SIZE = 200
     mapper = Mapper(size=MAP_SIZE, dist_cutoff=50, connect_cutoff=40)
     radar = Radar()
     car = Car(position=(MAP_SIZE // 2, 10),
@@ -129,7 +129,7 @@ def main():
     #           "Angle:", car.curr_dir * (180 / math.pi))
 
     # initial scan
-    for _ in range(40):
+    for _ in range(15):
         angle, dist = radar.scan_step()
         angle_in_rad = math.radians(-angle) + car.curr_dir
         angle_in_rad %= (2 * math.pi)
@@ -147,8 +147,10 @@ def main():
         ray = Ray(tuple(position), angle_in_rad, round(dist / 2))
         mapper.add_ray(ray)
 
-        if time.monotonic() - start_time > 4:
+        if time.monotonic() - start_time > 5:
             break
+
+    fc.stop()
 
     mapper.plot(save_file="./debug/map.jpg")
 
