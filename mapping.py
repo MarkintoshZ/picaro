@@ -5,7 +5,7 @@ from typing import Iterable, Union
 import numpy as np
 import picar_4wd as fc
 
-from map import Mapper
+from map import Mapper, Ray
 
 
 class Radar:
@@ -38,7 +38,7 @@ class Radar:
 
 class Car:
     _SPEED = 10
-    _SPEED_SCALER = 1 / 200
+    _SPEED_SCALER = 4
     _TURN_SCALER = (17 / 3) / (2 * math.pi)
 
     def __init__(self, position: Iterable, dir_in_rad: float):
@@ -88,38 +88,58 @@ class Car:
 
 
 def main():
-    MAP_SIZE = 100
+    MAP_SIZE = 500
     mapper = Mapper(size=MAP_SIZE)
     radar = Radar()
     car = Car(position=(MAP_SIZE // 2, MAP_SIZE // 2),
               dir_in_rad=math.radians(90))
 
-    # test car turning calibration
-    car.turn_absolute_deg(0)
-    car.turn_absolute_deg(270)
-    assert car.curr_dir == math.radians(270)
-    car.turn_absolute_deg(180)
-    car.turn_absolute_deg(90)
-    car.turn_absolute_deg(180)
-    car.turn_absolute_deg(270)
-    car.turn_absolute_deg(0)
-    car.turn_absolute_deg(90)
-    assert car.curr_dir == math.radians(90)
+    # # test car turning calibration
+    # car.turn_absolute_deg(0)
+    # car.turn_absolute_deg(270)
+    # assert car.curr_dir == math.radians(270)
+    # car.turn_absolute_deg(180)
+    # car.turn_absolute_deg(90)
+    # car.turn_absolute_deg(180)
+    # car.turn_absolute_deg(270)
+    # car.turn_absolute_deg(0)
+    # car.turn_absolute_deg(90)
+    # assert car.curr_dir == math.radians(90)
+    # 
+    # # test car driving and position calibration
+    # for i in range(4):
+    #     print(f'Edge: {i}')
+    #     car.forward()
+    #     time.sleep(0.5)
+    #     print("Position:", car.get_position(),
+    #           "Angle:", car.curr_dir * (180 / math.pi))
+    #     time.sleep(0.5)
+    #     car.stop()
+    #     print("Position:", car.get_position(),
+    #           "Angle:", car.curr_dir * (180 / math.pi))
+    #     car.turn_relative(math.radians(90))
+    #     print("Position:", car.get_position(),
+    #           "Angle:", car.curr_dir * (180 / math.pi))
 
-    # test car driving and position calibration
-    for i in range(4):
-        print(f'Edge: {i}')
+    # initial scan
+    for _ in range(40):
+        angle, dist = radar.scan_step()
+        position = car.get_position().round().astype(int)
+        ray = Ray(tuple(position), angle, round(dist / 2))
+        print(ray)
+        mapper.add_ray(ray)
+
+    start_time = time.monotonic()
+    while True:
         car.forward()
-        time.sleep(0.5)
-        print("Position:", car.get_position(),
-              "Angle:", car.curr_dir * (180 / math.pi))
-        time.sleep(0.5)
-        car.stop()
-        print("Position:", car.get_position(),
-              "Angle:", car.curr_dir * (180 / math.pi))
-        car.turn_relative(math.radians(90))
-    print("Position:", car.get_position(),
-          "Angle:", car.curr_dir * (180 / math.pi))
+        angle, dist = radar.scan_step()
+        position = car.get_position().round().astype(int)
+        mapper.add_ray(Ray(tuple(position), angle, round(dist / 2)))
+
+        if time.monotonic() - start_time > 6:
+            break
+
+    mapper.plot(save_file="./debug/map.jpg")
 
 
 if __name__ == '__main__':
