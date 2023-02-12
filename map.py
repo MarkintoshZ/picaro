@@ -47,7 +47,6 @@ class Mapper:
                 self.shade_triangle(
                     last_ray.origin, this_ray_end, last_ray_end)
                 if max(ray.dist, last_ray.dist) < self.dist_cutoff:
-                    print(last_ray_end)
                     self.draw_line(this_ray_end, last_ray_end)
         self.rays.append(ray)
 
@@ -128,7 +127,7 @@ class Mapper:
         import matplotlib.pyplot as plt
 
         plt.figure(dpi=400)
-        plt.pcolormesh(self.data, cmap='Greys', edgecolors='k', linewidth=1)
+        plt.pcolormesh(self.data, cmap='Greys')
         for ray in self.rays:
             x, y = ray.origin
             dx = np.cos(ray.angle) * ray.dist
@@ -139,7 +138,10 @@ class Mapper:
         plt.gca().set_aspect('equal')  # type: ignore
 
         if save_file and isinstance(save_file, str):
-            plt.savefig(save_file, dpi=300)
+            try:
+                plt.savefig(save_file, dpi=300)
+            except Exception as e:
+                print('Failed to save plot', e)
         if show:
             plt.show()
 

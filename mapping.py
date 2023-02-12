@@ -1,6 +1,6 @@
 import math
 import time
-from typing import Iterable, Union
+from typing import Iterable, Tuple, Union
 
 import numpy as np
 import picar_4wd as fc
@@ -9,7 +9,7 @@ from map import Mapper, Ray
 
 
 class Radar:
-    def __init__(self, angle_range: int=180, angle_step: int=9):
+    def __init__(self, angle_range: int = 180, angle_step: int = 18):
         self.angle_range = angle_range
         self.angle_step = angle_step
         self.step_direction = 1
@@ -18,7 +18,7 @@ class Radar:
         self.servo = fc.servo
         self.servo.set_angle(self.current_angle)
 
-    def scan_step(self):
+    def scan_step(self) -> Tuple[int, float]:
         max_angle = self.angle_range // 2
         min_angle = -max_angle
 
@@ -29,17 +29,23 @@ class Radar:
         elif self.current_angle <= min_angle:
             self.current_angle = min_angle
             self.step_direction = -self.step_direction
-        dist = fc.get_distance_at(self.current_angle)
+        dist = self.get_distance_at(self.current_angle, sleep_duration=0.01)
         if dist < 0:
             dist = 100
 
         return self.current_angle, dist
 
+    def get_distance_at(self, angle: float, sleep_duration: float = 0.04) -> float:
+        self.servo.set_angle(angle)
+        time.sleep(sleep_duration)
+        distance = fc.us.get_distance()
+        return distance
+
 
 class Car:
-    _SPEED = 10
-    _SPEED_SCALER = 4
-    _TURN_SCALER = (17 / 3) / (2 * math.pi)
+    _SPEED = 5
+    _SPEED_SCALER = 2
+    _TURN_SCALER = (17 / 30) / (2 * math.pi)
 
     def __init__(self, position: Iterable, dir_in_rad: float):
         self._position = np.array(position)
@@ -48,8 +54,9 @@ class Car:
         self.start_time: Union[float, None] = None
 
     def forward(self):
-        fc.forward(self._SPEED)
-        self.start_time = time.monotonic()
+        if not self.start_time:
+            fc.forward(self._SPEED)
+            self.start_time = time.monotonic()
 
     def stop(self):
         fc.stop()
@@ -63,7 +70,7 @@ class Car:
         else:
             fc.turn_right(self._SPEED)
 
-        time.sleep(abs(angle_in_rad) * self._TURN_SCALER)
+        time.sleep(abs(angle_in_rad) * self._SPEED * self._TURN_SCALER)
         fc.stop()
         time.sleep(0.5)
 
@@ -78,20 +85,20 @@ class Car:
         self.turn_absolute(math.radians(dir_in_deg))
 
     def get_position(self):
-        if self.start_time:
+        if self.start_time is not None:
             duration = time.monotonic() - self.start_time
             dir_vec = np.array([np.cos(self.curr_dir),
                                 np.sin(self.curr_dir)])
             return self._position + dir_vec * duration * self._SPEED * self._SPEED_SCALER
         else:
-            return self._position
+            return self._position.copy()
 
 
 def main():
-    MAP_SIZE = 500
-    mapper = Mapper(size=MAP_SIZE, dist_cutoff=40, connect_cutoff=20)
+    MAP_SIZE = 100
+    mapper = Mapper(size=MAP_SIZE, dist_cutoff=50, connect_cutoff=40)
     radar = Radar()
-    car = Car(position=(MAP_SIZE // 2, MAP_SIZE // 2),
+    car = Car(position=(MAP_SIZE // 2, 10),
               dir_in_rad=math.radians(90))
 
     # # test car turning calibration
@@ -105,7 +112,7 @@ def main():
     # car.turn_absolute_deg(0)
     # car.turn_absolute_deg(90)
     # assert car.curr_dir == math.radians(90)
-    # 
+    #
     # # test car driving and position calibration
     # for i in range(4):
     #     print(f'Edge: {i}')
@@ -124,23 +131,23 @@ def main():
     # initial scan
     for _ in range(40):
         angle, dist = radar.scan_step()
-        angle_in_rad = math.radians(-angle + 90) + car.curr_dir
+        angle_in_rad = math.radians(-angle) + car.curr_dir
         angle_in_rad %= (2 * math.pi)
         position = car.get_position().round().astype(int)
         ray = Ray(tuple(position), angle_in_rad, round(dist / 2))
-        print(ray)
         mapper.add_ray(ray)
 
     start_time = time.monotonic()
     while True:
         car.forward()
         angle, dist = radar.scan_step()
-        angle_in_rad = math.radians(-angle + 90) + car.curr_dir
+        angle_in_rad = math.radians(-angle) + car.curr_dir
         angle_in_rad %= (2 * math.pi)
         position = car.get_position().round().astype(int)
-        mapper.add_ray(Ray(tuple(position), angle_in_rad, round(dist / 2)))
+        ray = Ray(tuple(position), angle_in_rad, round(dist / 2))
+        mapper.add_ray(ray)
 
-        if time.monotonic() - start_time > 6:
+        if time.monotonic() - start_time > 4:
             break
 
     mapper.plot(save_file="./debug/map.jpg")
