@@ -153,6 +153,7 @@ def main():
     fc.stop()
 
     mapper.plot(save_file="./debug/map.jpg")
+    print(mapper.rays)
 
 
 if __name__ == '__main__':
