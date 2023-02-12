@@ -19,7 +19,7 @@ class Radar:
         self.servo.set_angle(self.current_angle)
 
     def scan_step(self):
-        max_angle = self.angle_step // 2
+        max_angle = self.angle_range // 2
         min_angle = -max_angle
 
         self.current_angle += self.angle_step * self.step_direction
@@ -89,7 +89,7 @@ class Car:
 
 def main():
     MAP_SIZE = 500
-    mapper = Mapper(size=MAP_SIZE)
+    mapper = Mapper(size=MAP_SIZE, dist_cutoff=40, connect_cutoff=20)
     radar = Radar()
     car = Car(position=(MAP_SIZE // 2, MAP_SIZE // 2),
               dir_in_rad=math.radians(90))
@@ -124,8 +124,10 @@ def main():
     # initial scan
     for _ in range(40):
         angle, dist = radar.scan_step()
+        angle_in_rad = math.radians(-angle + 90) + car.curr_dir
+        angle_in_rad %= (2 * math.pi)
         position = car.get_position().round().astype(int)
-        ray = Ray(tuple(position), angle, round(dist / 2))
+        ray = Ray(tuple(position), angle_in_rad, round(dist / 2))
         print(ray)
         mapper.add_ray(ray)
 
@@ -133,8 +135,10 @@ def main():
     while True:
         car.forward()
         angle, dist = radar.scan_step()
+        angle_in_rad = math.radians(-angle + 90) + car.curr_dir
+        angle_in_rad %= (2 * math.pi)
         position = car.get_position().round().astype(int)
-        mapper.add_ray(Ray(tuple(position), angle, round(dist / 2)))
+        mapper.add_ray(Ray(tuple(position), angle_in_rad, round(dist / 2)))
 
         if time.monotonic() - start_time > 6:
             break
