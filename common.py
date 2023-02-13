@@ -1,89 +1,135 @@
-"Common helper functions and datatypes for picar_4wd"""
+"Common helper classes for pi car"""
+import math
+import time
+from typing import Iterable, Tuple, Union
 
-from enum import Enum
-from typing import Tuple, Union
-
+import numpy as np
 import picar_4wd as fc
 
 
-__all__ = ["Command", "drive", "left_turn", "right_turn", "get_line_status", "scan_step"]
+class Radar:
+    """Control and read from the ultrasonic sensor"""
+
+    def __init__(self, angle_range: int = 180, angle_step: int = 18):
+        self.angle_range = angle_range
+        self.angle_step = angle_step
+        self.step_direction = 1
+        self.current_angle: int = 0
+
+        self.servo = fc.servo
+        self.servo.set_angle(self.current_angle)
+
+    def scan_step(self) -> Tuple[int, float]:
+        """scan environment and return angle and distance
+
+        Returns:
+            Tuple[int, float]: tuple of angle and distance
+        """
+        max_angle = self.angle_range // 2
+        min_angle = -max_angle
+
+        self.current_angle += self.angle_step * self.step_direction
+        if self.current_angle >= max_angle:
+            self.current_angle = max_angle
+            self.step_direction = -self.step_direction
+        elif self.current_angle <= min_angle:
+            self.current_angle = min_angle
+            self.step_direction = -self.step_direction
+        dist = self.get_distance_at(self.current_angle, sleep_duration=0.01)
+        if dist < 0:
+            dist = 100
+
+        return self.current_angle, dist
+
+    def get_distance_at(self, angle: float, sleep_duration: float = 0.04) -> float:
+        """get distance at angle
+
+        Args:
+            angle (float): angle of the ultrasonic sensor in degrees
+            sleep_duration (float, optional): duration for sensor to turn. Defaults to 0.04.
+
+        Returns:
+            float: _description_
+        """
+        self.servo.set_angle(angle)
+        time.sleep(sleep_duration)
+        distance = fc.us.get_distance()
+        return distance
 
 
-class Command(Enum):
-    """Driving commands"""
-    FORWARD = "forward"
-    BACKWARD = "backword"
-    LEFT_SPIN = "left-spin"
-    LEFT_TURN = "left-turn"
-    RIGHT_SPIN = "right-spin"
-    RIGHT_TURN = "right-turn"
-    STOP = "stop"
+class Car:
+    """Control the pi car movement while keeping track of position and direction"""
+    _SPEED = 5
+    _SPEED_SCALER = 2
+    _TURN_SCALER = (17 / 30) / (2 * math.pi)
 
+    def __init__(self, position: Iterable, dir_in_rad: float):
+        self._position = np.array(position)
+        self.curr_dir = dir_in_rad
 
-def left_turn(speed: int, diff: Union[int, None] = None):
-    if not diff:
-        diff = round(speed * 0.7)
-    fc.left_front.set_power(speed - diff)
-    fc.left_rear.set_power(speed - diff)
-    fc.right_front.set_power(speed + diff)
-    fc.right_rear.set_power(speed + diff)
+        self.start_time: Union[float, None] = None
 
+    def forward(self):
+        """move forward"""
+        if not self.start_time:
+            fc.forward(self._SPEED)
+            self.start_time = time.monotonic()
 
-def right_turn(speed: int, diff: Union[int, None] = None):
-    if not diff:
-        diff = round(speed * 0.7)
-    fc.left_front.set_power(speed + diff)
-    fc.left_rear.set_power(speed + diff)
-    fc.right_front.set_power(speed - diff)
-    fc.right_rear.set_power(speed - diff)
-
-
-def drive(cmd: Command, speed: int = 20) -> None:
-    """Execute driving command by setting motor speed"""
-    if cmd == Command.STOP:
+    def stop(self):
+        """stop the car"""
         fc.stop()
-    else:
-        func = {
-            Command.FORWARD: fc.forward,
-            Command.BACKWARD: fc.backward,
-            Command.LEFT_SPIN: fc.turn_left,
-            Command.LEFT_TURN: left_turn,
-            Command.RIGHT_SPIN: fc.turn_right,
-            Command.RIGHT_TURN: right_turn,
-        }[cmd]
-        func(speed)
+        self._position = self.get_position()
+        self.start_time = None
+        time.sleep(0.5)
 
+    def turn_relative(self, angle_in_rad: float):
+        """turn the car by angle in radians
 
-def get_line_status(threshold: int = 400) -> Tuple[bool, bool, bool]:
-    """Return a tuple of three bool representing whether left, middle, and 
-    right sensors are detecting dark surfaces respectively by comparing the 
-    sensor reading to the given threshold"""
-    return (
-        fc.gs2.read() < threshold,
-        fc.gs1.read() < threshold,
-        fc.gs0.read() < threshold,
-    )
+        Args:
+            angle_in_rad (float): positive for left, negative for right
+        """
+        if angle_in_rad == 0:
+            return
 
+        if angle_in_rad > 0:
+            fc.turn_left(self._SPEED)
+        else:
+            fc.turn_right(self._SPEED)
 
-def scan_step(ref1: int, ref2: int):
-    fc.current_angle += fc.us_step
-    if fc.current_angle >= fc.max_angle:
-        fc.current_angle = fc.max_angle
-        fc.us_step = -fc.STEP
-    elif fc.current_angle <= fc.min_angle:
-        fc.current_angle = fc.min_angle
-        fc.us_step = fc.STEP
-    status = fc.get_status_at(fc.current_angle, ref1=ref1, ref2=ref2)#ref1
+        time.sleep(abs(angle_in_rad) * self._SPEED * self._TURN_SCALER)
+        fc.stop()
+        time.sleep(0.5)
 
-    fc.scan_list.append(status)
-    if fc.current_angle == fc.min_angle or fc.current_angle == fc.max_angle:
-        if fc.us_step < 0:
-            # print("reverse")
-            fc.scan_list.reverse()
-        # print(scan_list)
-        tmp = fc.scan_list.copy()
-        fc.scan_list = []
-        return tmp
-    else:
-        return False
+        self.curr_dir += angle_in_rad
+        self.curr_dir %= 2 * math.pi
 
+    def turn_absolute(self, dir_in_rad: float):
+        """turn the car to face a direction in radians
+
+        Args:
+            dir_in_rad (float): direction in radians
+        """
+        diff = dir_in_rad - self.curr_dir
+        self.turn_relative(math.copysign(abs(diff % math.pi), math.sin(diff)))
+
+    def turn_absolute_deg(self, dir_in_deg: float):
+        """turn the car to face a direction in degrees
+
+        Args:
+            dir_in_deg (float): _description_
+        """
+        self.turn_absolute(math.radians(dir_in_deg))
+
+    def get_position(self) -> np.ndarray:
+        """get current position of the car
+
+        Returns:
+            np.ndarray: position of the car in the form of [x, y]
+        """
+        if self.start_time is not None:
+            duration = time.monotonic() - self.start_time
+            dir_vec = np.array([np.cos(self.curr_dir),
+                                np.sin(self.curr_dir)])
+            return self._position + dir_vec * duration * self._SPEED * self._SPEED_SCALER
+        else:
+            return self._position.copy()
