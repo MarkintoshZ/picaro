@@ -96,7 +96,7 @@ class Car:
 
 def main():
     MAP_SIZE = 100
-    mapper = Mapper(size=MAP_SIZE, dist_cutoff=10, connect_cutoff=10)
+    mapper = Mapper(size=MAP_SIZE, dist_cutoff=7, connect_cutoff=7)
     radar = Radar()
     car = Car(position=(MAP_SIZE // 2, 10),
               dir_in_rad=math.radians(90))
