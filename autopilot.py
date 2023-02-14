@@ -5,14 +5,21 @@ from typing import List, Tuple
 
 import picar_4wd as fc
 
-from map import Mapper
-from common import Car
+from map import Mapper, Ray
+from common import Car, Radar
 
 
 MAP_SIZE = 150
 
 
-def navigate(path: List[Tuple[int, int]], car: Car, object_detection: bool):
+def navigate(
+    path: List[Tuple[int, int]],
+    car: Car,
+    radar: Radar,
+    object_detection: bool
+) -> bool:
+    """Attempt to navigate to the given path. Returns True if successful, False 
+    otherwise"""
     if object_detection:
         from detect import run as detect
         detector = detect("efficientdet_lite0.tflite", 0, 640, 480, 4, False)
@@ -42,6 +49,12 @@ def navigate(path: List[Tuple[int, int]], car: Car, object_detection: bool):
             if curr_car_pos[0] == waypoint[0] and curr_car_pos[1] == waypoint[1]:
                 break
 
+            for angle in range(-20, 20, 10):
+                dist = radar.get_distance_at(angle)
+                if dist < 20:
+                    # encountered obstacle, stop and return
+                    return False
+
             if object_detection:
                 has_stop_sign = next(detector)
                 if has_stop_sign:
@@ -53,24 +66,32 @@ def navigate(path: List[Tuple[int, int]], car: Car, object_detection: bool):
 
         car.stop()
 
+        return True
+
 
 def main(object_detection: bool = False):
+    radar = Radar()
     mapper = Mapper(size=MAP_SIZE, dist_cutoff=50, connect_cutoff=40)
     car = Car(position=(12, 15),
               dir_in_rad=math.radians(90))
 
-    path: List[Tuple[int, int]] = [
-        (12, 15),
-        (12, 80),
-        (90, 80),
-        (90, 120),
-        (115, 120),
-        (116, 120),
-    ]  # TODO: get A* path from mapper
-    navigate(path, car, object_detection)
-
-    # path: List[Tuple[int, int]] = []  # TODO: get A* path from mapper
-    # navigate(path, car, object_detection)
+    dest = (MAP_SIZE - 30, MAP_SIZE - 30)
+    while True:
+        print("Scanning...")
+        for _ in range(15):
+            angle, dist = radar.scan_step()
+            angle_in_rad = math.radians(-angle) + car.curr_dir
+            angle_in_rad %= (2 * math.pi)
+            position = car.get_position().round().astype(int)
+            ray = Ray(tuple(position), angle_in_rad, round(dist / 4))
+            mapper.add_ray(ray)
+        print("Finding path...")
+        path = mapper.route(car.get_position(), dest)
+        mapper.plot(path=path, save_file=f"./debug/map-{time.time()}.jpg")
+        print("Following path...")
+        if navigate(path, car, radar, object_detection):
+            break
+    print("Reached destination!")
 
 
 if __name__ == '__main__':

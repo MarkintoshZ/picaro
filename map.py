@@ -1,5 +1,7 @@
 import numpy as np
-from typing import NamedTuple, Tuple
+from typing import Union, List, NamedTuple, Tuple
+
+from astar import astar
 
 
 Ray = NamedTuple(
@@ -9,11 +11,6 @@ Ray = NamedTuple(
         ('angle', float),
         ('dist', int),
     ])
-
-
-class LocationTracker:
-    """Keeps track of current location of the car"""
-    pass
 
 
 class Mapper:
@@ -123,7 +120,8 @@ class Mapper:
             s += '\n'
         return s
 
-    def plot(self, show=True, save_file=None) -> None:
+    def plot(self, path=Union[None, List[Tuple[int, int]]],
+             show=True, save_file=None) -> None:
         import matplotlib.pyplot as plt
 
         plt.figure(dpi=400)
@@ -135,6 +133,12 @@ class Mapper:
             plt.arrow(x + 0.5, y + 0.5, dx, dy, color='g', width=0.01,
                       head_width=0.05, head_length=0.02)
 
+        if path:
+            overlay = np.zeros_like(self.data)
+            for x, y in path:
+                overlay[y, x] = 1
+            plt.pcolormesh(overlay, cmap='Reds', alpha=0.5)
+
         plt.gca().set_aspect('equal')  # type: ignore
 
         if save_file and isinstance(save_file, str):
@@ -144,6 +148,10 @@ class Mapper:
                 print('Failed to save plot', e)
         if show:
             plt.show()
+
+    def route(self, start: Tuple[int, int], dest: Tuple[int, int]) -> List[Tuple[int, int]]:
+        """Find a route from start to dest"""
+        return astar(self.data == self.FILLED, start, dest)
 
 
 if __name__ == '__main__':
