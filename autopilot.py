@@ -53,7 +53,7 @@ def navigate(
                 dist = radar.get_distance_at(angle, sleep_duration=0.02)
                 if dist < 20:
                     # encountered obstacle, stop and return
-                    fc.stop()
+                    car.stop()
                     return False
 
             if object_detection:
