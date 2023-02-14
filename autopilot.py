@@ -69,7 +69,7 @@ def navigate(
 
         car.stop()
 
-        return True
+    return True
 
 
 def main(object_detection: bool = False):
