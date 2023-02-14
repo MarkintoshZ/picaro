@@ -72,10 +72,10 @@ def navigate(
 def main(object_detection: bool = False):
     radar = Radar()
     mapper = Mapper(size=MAP_SIZE, dist_cutoff=50, connect_cutoff=40)
-    car = Car(position=(12, 15),
+    car = Car(position=(MAP_SIZE // 2, 25),
               dir_in_rad=math.radians(90))
 
-    dest = (MAP_SIZE - 30, MAP_SIZE - 30)
+    dest = (MAP_SIZE // 2, 80)
     while True:
         print("Scanning...")
         for _ in range(15):
@@ -88,6 +88,9 @@ def main(object_detection: bool = False):
         print("Finding path...")
         path = mapper.route(car.get_position(), dest)
         mapper.plot(path=path, save_file=f"./debug/map-{time.time()}.jpg")
+        if path is None:
+            print("No path found!")
+            return
         print("Following path...")
         if navigate(path, car, radar, object_detection):
             break
