@@ -1,194 +1,74 @@
+import heapq
 import numpy as np
 
-
-class Node:
+def astar(array, begin, dest):
     """
-        A node class for A* Pathfinding
-        parent is parent of the current Node
-        position is current position of the Node in the maze
-        g is cost from start to current Node
-        h is heuristic based estimated cost for current Node to end Node
-        f is total cost of present node i.e. :  f = g + h
+    set array coming from map.data,whihc is two 2d array.
     """
+    neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
 
-    def __init__(self, parent=None, position=None):
-        self.parent = parent
-        self.position = position
+    openlist = []
+    gc = {begin: 0}
+    close_set = set()
+    came_from = {}
+    totalcost = {begin: heur(begin, dest)}
+    heapq.heappush(openlist, (totalcost[begin], begin))
 
-        self.g = 0
-        self.h = 0
-        self.f = 0
-
-    def __eq__(self, other):
-        return self.position == other.position
-
-
-# This function return the path of the search
-def return_path(current_node, maze):
-    path = []
-    no_rows, no_columns = np.shape(maze)
-    # here we create the initialized result maze with -1 in every position
-    result = [[-1 for i in range(no_columns)] for j in range(no_rows)]
-    current = current_node
-    while current is not None:
-        path.append(current.position)
-        current = current.parent
-    # Return reversed path as we need to show from start to end path
-    path = path[::-1]
-    start_value = 0
-    # we update the path of start to end found by A-star serch with every step incremented by 1
-    for i in range(len(path)):
-        result[path[i][0]][path[i][1]] = start_value
-        start_value += 1
-    return result
-
-
-def search(maze, cost, start, end):
-    """
-        Returns a list of tuples as a path from the given start to the given end in the given maze
-        :param maze:
-        :param cost
-        :param start:
-        :param end:
-        :return:
-    """
-
-    # Create start and end node with initized values for g, h and f
-    start_node = Node(None, tuple(start))
-    start_node.g = start_node.h = start_node.f = 0
-    end_node = Node(None, tuple(end))
-    end_node.g = end_node.h = end_node.f = 0
-
-    # Initialize both yet_to_visit and visited list
-    # in this list we will put all node that are yet_to_visit for exploration.
-    # From here we will find the lowest cost node to expand next
-    yet_to_visit_list = []
-    # in this list we will put all node those already explored so that we don't explore it again
-    visited_list = []
-
-    # Add the start node
-    yet_to_visit_list.append(start_node)
-
-    # Adding a stop condition. This is to avoid any infinite loop and stop
-    # execution after some reasonable number of steps
-    outer_iterations = 0
-    max_iterations = (len(maze) // 2) ** 10
-
-    # what squares do we search . serarch movement is left-right-top-bottom
-    # (4 movements) from every positon
-
-    move = [[-1, 0],  # go up
-            [0, -1],  # go left
-            [1, 0],  # go down
-            [0, 1]]  # go right
-
-    """
-        1) We first get the current node by comparing all f cost and selecting the lowest cost node for further expansion
-        2) Check max iteration reached or not . Set a message and stop execution
-        3) Remove the selected node from yet_to_visit list and add this node to visited list
-        4) Perofmr Goal test and return the path else perform below steps
-        5) For selected node find out all car_new_possible_postion (use move to find car_new_possible_postion)
-            a) get the current postion for the selected node (this becomes parent node for the car_new_possible_postion)
-            b) check if a valid position exist (boundary will make few nodes invalid)
-            c) if any node is a wall then ignore that
-            d) add to valid car_new_possible_postion node list for the selected parent
-
-            For all the car_new_possible_postion node
-                a) if cars in visited list then ignore it and try next node
-                b) calculate cars node g, h and f values
-                c) if cars in yet_to_visit list then ignore it
-                d) else move the cars to yet_to_visit list
-    """
-    # find maze has got how many rows and columns
-    no_rows, no_columns = np.shape(maze)
-
-    # Loop until you find the end
-
-    while len(yet_to_visit_list) > 0:
-
-        # Every time any node is referred from yet_to_visit list, counter of limit operation incremented
-        outer_iterations += 1
-
-        # Get the current node
-        current_node = yet_to_visit_list[0]
-        current_index = 0
-        for index, item in enumerate(yet_to_visit_list):
-            if item.f < current_node.f:
-                current_node = item
-                current_index = index
-
-        # if we hit this point return the path such as it may be no solution or
-        # computation cost is too high
-        if outer_iterations > max_iterations:
-            print("giving up on pathfinding too many iterations")
-            return return_path(current_node, maze)
-
-        # Pop current node out off yet_to_visit list, add to visited list
-        yet_to_visit_list.pop(current_index)
-        visited_list.append(current_node)
-
-        # test if goal is reached or not, if yes then return the path
-        if current_node == end_node:
-            return return_path(current_node, maze)
-
-        # Generate car_new_possible_postion from all adjacent squares
-        car_new_possible_postion = []
-
-        for new_position in move:
-
-            # Get node position
-            node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
-
-            # Make sure within range (check if within maze boundary)
-            if (node_position[0] > (no_rows - 1) or
-                    node_position[0] < 0 or
-                    node_position[1] > (no_columns - 1) or
-                    node_position[1] < 0):
+    while openlist:
+        current = heapq.heappop(openlist)[1]
+        if current == dest:
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.append(begin)
+            path.reverse()
+            return path
+        close_set.add(current)
+        for i, j in neighbors:
+            neighbor = current[0] + i, current[1] + j
+            tentative_gc = gc[current] + heur(current, neighbor)
+            if 0 <= neighbor[0] < array.shape[0]:
+                if 0 <= neighbor[1] < array.shape[1]:
+                    if array[neighbor[0]][neighbor[1]] == 1:
+                        continue
+                else:
+                    continue
+            else:
                 continue
-
-            # Make sure walkable terrain
-            if maze[node_position[0]][node_position[1]] != 0:
+            if neighbor in close_set and tentative_gc >= gc.get(neighbor, 0):
                 continue
-
-            # Create new node
-            new_node = Node(current_node, node_position)
-
-            # Append
-            car_new_possible_postion.append(new_node)
-
-        # Loop through car_new_possible_postion
-        for cars in car_new_possible_postion:
-
-            # Child is on the visited list (search entire visited list)
-            if len([visited_child for visited_child in visited_list if visited_child == cars]) > 0:
-                continue
-
-            # Create the f, g, and h values
-            cars.g = current_node.g + cost
-            ## Heuristic costs calculated here, this is using eucledian distance
-            cars.h = (((cars.position[0] - end_node.position[0]) ** 2) +
-                       ((cars.position[1] - end_node.position[1]) ** 2))
-
-            cars.f = cars.g + cars.h
-
-            # Child is already in the yet_to_visit list and g cost is already lower
-            if len([i for i in yet_to_visit_list if cars == i and cars.g > i.g]) > 0:
-                continue
-
-            # Add the cars to the yet_to_visit list
-            yet_to_visit_list.append(cars)
+            if tentative_gc < gc.get(neighbor, 0) or neighbor not in [i[1] for i in openlist]:
+                came_from[neighbor] = current
+                gc[neighbor] = tentative_gc
+                totalcost[neighbor] = tentative_gc + heur(neighbor, dest)
+                heapq.heappush(openlist, (totalcost[neighbor], neighbor))
+    return None
 
 
-if __name__ == '__main__':
-    maze = [[0, 1, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0],
-            [0, 1, 0, 1, 0, 0],
-            [0, 1, 0, 0, 1, 0],
-            [0, 0, 0, 0, 1, 0]]
+def heur(a, b):
+    return (((a[0]-b[0])**2+(a[1]- b[1])**2)) ** 0.5
 
-    start = [0, 0]  # starting position
-    end = [4, 5]  # ending position
-    cost = 1  # cost per movement
 
-    path = search(maze, cost, start, end)
-    print(path)
+# array = np.array([[0, 0, 0, 0],
+#                  [0, 0, 0, 0],
+#                  [0, 0, 0, 0],
+#                  [0, 0, 0, 0],
+#                   [0, 0, 0, 0]])
+#
+# array = np.array([[0, 0, 0, 0],
+#          [0, 1, 1, 0],
+#          [0, 1, 0, 0],
+#          [0, 0, 0, 0]])
+
+
+array = np.array([[0, 0, 0, 0],
+                [1, 0, 1, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]])
+
+start = (0, 0)
+end = (3, 3)
+
+path = astar(array, start, end)
+print(path)
