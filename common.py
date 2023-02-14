@@ -88,6 +88,7 @@ class Car:
         Args:
             angle_in_rad (float): positive for left, negative for right
         """
+        print("turn relative", math.degrees(angle_in_rad))
         if angle_in_rad == 0:
             return
 
