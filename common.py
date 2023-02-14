@@ -92,7 +92,7 @@ class Car:
             return
 
         if angle_in_rad > 0:
-            fc.turn_left(self._SPEED)
+            fc.turn_left(int(round(self._SPEED * 2)))
         else:
             fc.turn_right(self._SPEED)
 
