@@ -3,7 +3,7 @@ import numpy as np
 
 
 def astar(array, begin, dest):
-    print(array.sum())
+    print(array.sum(), begin, dest)
     print(array)
     """
     set array coming from map.data,whihc is two 2d array.
@@ -11,8 +11,8 @@ def astar(array, begin, dest):
     begin = tuple(begin)
     dest = tuple(dest)
 
-    neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0),
-                 (1, 1), (1, -1), (-1, 1), (-1, -1)]
+    neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+                #  (1, 1), (1, -1), (-1, 1), (-1, -1)]
 
     openlist = []
     gc = {begin: 0}
