@@ -109,5 +109,7 @@ if __name__ == '__main__':
 
     try:
         main(args.objectDetection)
+    except Exception as e:
+        print(e)
     finally:
         fc.stop()
