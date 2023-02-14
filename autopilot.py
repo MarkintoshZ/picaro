@@ -52,7 +52,7 @@ def navigate(
                 break
 
             for angle in range(-20, 20, 10):
-                dist = radar.get_distance_at(angle, sleep_duration=0.02)
+                dist = radar.get_distance_at(angle, sleep_duration=0.04)
                 if dist < 20:
                     # encountered obstacle, stop and return
                     car.stop()
