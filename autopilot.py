@@ -87,7 +87,7 @@ def main(object_detection: bool = False):
             ray = Ray(tuple(position), angle_in_rad, round(dist / 4))
             mapper.add_ray(ray)
         print("Finding path...")
-        path = mapper.route(car.get_position(), dest)
+        path = mapper.route(car.get_position().round().astype(int), dest)
         mapper.plot(path=path, save_file=f"./debug/map-{time.time()}.jpg")
         if path is None:
             print("No path found!")
