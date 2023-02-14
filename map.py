@@ -1,5 +1,7 @@
-import numpy as np
+import time
 from typing import Union, List, NamedTuple, Tuple
+
+import numpy as np
 
 from astar import astar
 
@@ -151,6 +153,8 @@ class Mapper:
 
     def route(self, start: Tuple[int, int], dest: Tuple[int, int]) -> List[Tuple[int, int]]:
         """Find a route from start to dest"""
+        with open(f'./debug/map-{time.time()}.npy', 'wb') as f:
+            np.save(f, self.data)
         return astar((self.data == self.FILLED).astype(int), start, dest)
 
 

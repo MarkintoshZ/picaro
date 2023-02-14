@@ -1,4 +1,3 @@
-import time
 import heapq
 import numpy as np
 
@@ -9,8 +8,6 @@ def astar(array, begin, dest):
     """
     print(array.sum(), begin, dest)
     print(array)
-    with open(f'./debug/map-{time.time()}.txt', 'wb') as f:
-        np.save(f, array)
     begin = tuple(begin)
     dest = tuple(dest)
 

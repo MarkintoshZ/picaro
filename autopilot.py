@@ -74,7 +74,7 @@ def navigate(
 
 def main(object_detection: bool = False):
     radar = Radar()
-    mapper = Mapper(size=MAP_SIZE, dist_cutoff=12, connect_cutoff=12)
+    mapper = Mapper(size=MAP_SIZE, dist_cutoff=20, connect_cutoff=20)
     car = Car(position=(MAP_SIZE // 2, 25),
               dir_in_rad=math.radians(90))
 
