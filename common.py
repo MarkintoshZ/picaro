@@ -35,7 +35,7 @@ class Radar:
         elif self.current_angle <= min_angle:
             self.current_angle = min_angle
             self.step_direction = -self.step_direction
-        dist = self.get_distance_at(self.current_angle, sleep_duration=0.04)
+        dist = self.get_distance_at(self.current_angle, sleep_duration=0.1)
         if dist < 0:
             dist = 100
 
