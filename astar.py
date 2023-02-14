@@ -1,3 +1,4 @@
+import time
 import heapq
 import numpy as np
 
@@ -5,6 +6,7 @@ import numpy as np
 def astar(array, begin, dest):
     print(array.sum(), begin, dest)
     print(array)
+    np.save(f'./debug/map-{time.time()}.npy', array)
     """
     set array coming from map.data,whihc is two 2d array.
     """
