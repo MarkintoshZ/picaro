@@ -15,7 +15,6 @@
 import argparse
 import sys
 import time
-import picar_4wd as fc
 
 import cv2
 from tflite_support.task import core
@@ -88,33 +87,28 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
             category_name = category.category_name
             objects.append(category_name)
 
-        # Stop at Stop Sign
-        if "stop sign" in objects:
-            #print('stop sign')
-            fc.stop()
-        else:
-            #print('no stop')
-            fc.forward(5)
+        yield "stop sign" in objects
 
         # Draw keypoints and edges on input image
-        image = utils.visualize(image, detection_result)
+        # image = utils.visualize(image, detection_result)
 
         # Calculate the FPS
         if counter % fps_avg_frame_count == 0:
             end_time = time.time()
             fps = fps_avg_frame_count / (end_time - start_time)
             start_time = time.time()
+        print("FPS: ", fps)
 
         # Show the FPS
-        fps_text = 'FPS = {:.1f}'.format(fps)
-        text_location = (left_margin, row_size)
-        cv2.putText(image, fps_text, text_location, cv2.FONT_HERSHEY_PLAIN,
-                    font_size, text_color, font_thickness)
+        # fps_text = 'FPS = {:.1f}'.format(fps)
+        # text_location = (left_margin, row_size)
+        # cv2.putText(image, fps_text, text_location, cv2.FONT_HERSHEY_PLAIN,
+        #             font_size, text_color, font_thickness)
 
         # Stop the program if the ESC key is pressed.
         if cv2.waitKey(1) == 27:
             break
-        cv2.imshow('object_detector', image)
+        # cv2.imshow('object_detector', image)
 
     cap.release()
     cv2.destroyAllWindows()
