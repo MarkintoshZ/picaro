@@ -110,8 +110,14 @@ class Car:
         Args:
             dir_in_rad (float): direction in radians
         """
-        diff = dir_in_rad - self.curr_dir
-        self.turn_relative(math.copysign(abs(diff % math.pi), math.sin(diff)))
+        # find relative angle to turn in radians
+        angle_in_rad = dir_in_rad - self.curr_dir
+        if angle_in_rad > math.pi:
+            angle_in_rad -= 2 * math.pi
+        elif angle_in_rad < -math.pi:
+            angle_in_rad += 2 * math.pi
+
+        self.turn_relative(angle_in_rad)
 
     def turn_absolute_deg(self, dir_in_deg: float):
         """turn the car to face a direction in degrees
