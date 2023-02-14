@@ -4,17 +4,18 @@ import numpy as np
 
 
 def astar(array, begin, dest):
-    print(array.sum(), begin, dest)
-    print(array)
-    np.save(f'./debug/map-{time.time()}.npy', array)
     """
     set array coming from map.data,whihc is two 2d array.
     """
+    print(array.sum(), begin, dest)
+    print(array)
+    with open(f'./debug/map-{time.time()}.txt', 'wb') as f:
+        np.save(f, array)
     begin = tuple(begin)
     dest = tuple(dest)
 
     neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-                #  (1, 1), (1, -1), (-1, 1), (-1, -1)]
+    #  (1, 1), (1, -1), (-1, 1), (-1, -1)]
 
     openlist = []
     gc = {begin: 0}
