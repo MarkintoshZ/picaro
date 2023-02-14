@@ -5,6 +5,9 @@ def astar(array, begin, dest):
     """
     set array coming from map.data,whihc is two 2d array.
     """
+    begin = tuple(begin)   
+    dest = tuple(dest)   
+
     neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
 
     openlist = []
