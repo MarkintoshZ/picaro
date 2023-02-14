@@ -11,8 +11,8 @@ def astar(array, begin, dest):
     begin = tuple(begin)
     dest = tuple(dest)
 
-    neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-    #  (1, 1), (1, -1), (-1, 1), (-1, -1)]
+    neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0),
+                 (1, 1), (1, -1), (-1, 1), (-1, -1)]
 
     openlist = []
     gc = {begin: 0}
@@ -69,13 +69,13 @@ def heur(a, b):
 #          [0, 0, 0, 0]])
 
 
-array = np.array([[0, 0, 0, 0],
-                  [1, 1, 1, 0],
-                  [0, 0, 0, 0],
-                  [0, 0, 0, 0]])
+# array = np.array([[0, 0, 0, 0],
+#                   [1, 1, 0, 0],
+#                   [0, 1, 0, 0],
+#                   [0, 0, 0, 1]])
 
-start = (0, 0)
-end = (3, 1)
+# start = (3, 0)
+# end = (0, 0)
 
-path = astar(array, start, end)
-print(path)
+# path = astar(array, start, end)
+# print(path)

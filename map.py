@@ -1,4 +1,3 @@
-import time
 from typing import Union, List, NamedTuple, Tuple
 
 import numpy as np
@@ -153,89 +152,100 @@ class Mapper:
 
     def route(self, start: Tuple[int, int], dest: Tuple[int, int]) -> List[Tuple[int, int]]:
         """Find a route from start to dest"""
-        with open(f'./debug/map-{time.time()}.npy', 'wb') as f:
-            np.save(f, self.data)
-        return astar((self.data == self.FILLED).astype(int), start, dest)
+        return astar((self.data == self.FILLED).astype(int).T, start, dest)
 
 
 if __name__ == '__main__':
-    rays = [
-        Ray(origin=(15, 10), angle=1.2566370614359172, dist=31),
-        Ray(origin=(15, 10), angle=0.9424777960769379, dist=28),
-        Ray(origin=(15, 10), angle=0.6283185307179586, dist=36),
-        Ray(origin=(15, 10), angle=0.3141592653589793, dist=35),
-        Ray(origin=(15, 10), angle=0.0, dist=42),
-        Ray(origin=(15, 10), angle=0.3141592653589793, dist=50),
-        Ray(origin=(15, 10), angle=0.6283185307179586, dist=50),
-        Ray(origin=(15, 10), angle=0.9424777960769379, dist=38),
-        Ray(origin=(15, 10), angle=1.2566370614359172, dist=35),
-        Ray(origin=(15, 10), angle=1.5707963267948966, dist=32),
-        Ray(origin=(15, 10), angle=1.8849555921538759, dist=29),
-        Ray(origin=(15, 10), angle=2.199114857512855, dist=32),
-        Ray(origin=(15, 10), angle=2.5132741228718345, dist=33),
-        Ray(origin=(15, 10), angle=2.827433388230814, dist=29),
-        Ray(origin=(15, 10), angle=3.141592653589793, dist=33),
-        Ray(origin=(15, 10), angle=2.827433388230814, dist=39),
-        Ray(origin=(15, 12), angle=2.5132741228718345, dist=50),
-        Ray(origin=(15, 14), angle=2.199114857512855, dist=29),
-        Ray(origin=(15, 16), angle=1.8849555921538759, dist=27),
-        Ray(origin=(15, 17), angle=1.5707963267948966, dist=27),
-        Ray(origin=(15, 18), angle=1.2566370614359172, dist=28),
-        Ray(origin=(15, 19), angle=0.9424777960769379, dist=28),
-        Ray(origin=(15, 20), angle=0.6283185307179586, dist=27),
-        Ray(origin=(15, 21), angle=0.3141592653589793, dist=26),
-        Ray(origin=(15, 22), angle=0.0, dist=29),
-        Ray(origin=(15, 23), angle=0.3141592653589793, dist=50),
-        Ray(origin=(15, 24), angle=0.6283185307179586, dist=44),
-        Ray(origin=(15, 26), angle=0.9424777960769379, dist=20),
-        Ray(origin=(15, 28), angle=1.2566370614359172, dist=19),
-        Ray(origin=(15, 29), angle=1.5707963267948966, dist=20),
-        Ray(origin=(15, 30), angle=1.8849555921538759, dist=29),
-        Ray(origin=(15, 30), angle=2.199114857512855, dist=31),
-        Ray(origin=(15, 32), angle=2.5132741228718345, dist=30),
-        Ray(origin=(15, 33), angle=2.827433388230814, dist=32),
-        Ray(origin=(15, 34), angle=3.141592653589793, dist=29),
-        Ray(origin=(15, 35), angle=2.827433388230814, dist=64),
-        Ray(origin=(15, 37), angle=2.5132741228718345, dist=33),
-        Ray(origin=(15, 40), angle=2.199114857512855, dist=22),
-        Ray(origin=(15, 41), angle=1.8849555921538759, dist=22),
-        Ray(origin=(15, 42), angle=1.5707963267948966, dist=27),
-        Ray(origin=(15, 42), angle=1.2566370614359172, dist=28),
-        Ray(origin=(15, 43), angle=0.9424777960769379, dist=18),
-        Ray(origin=(15, 44), angle=0.6283185307179586, dist=17),
-        Ray(origin=(15, 45), angle=0.3141592653589793, dist=16),
-        Ray(origin=(15, 45), angle=0.0, dist=25),
-        Ray(origin=(15, 46), angle=0.3141592653589793, dist=50),
-        Ray(origin=(15, 47), angle=0.6283185307179586, dist=15),
-        Ray(origin=(15, 48), angle=0.9424777960769379, dist=13),
-        Ray(origin=(15, 49), angle=1.2566370614359172, dist=28),
-        Ray(origin=(15, 50), angle=1.5707963267948966, dist=32),
-        Ray(origin=(15, 51), angle=1.8849555921538759, dist=29),
-        Ray(origin=(15, 51), angle=2.199114857512855, dist=28),
-        Ray(origin=(15, 53), angle=2.5132741228718345, dist=14),
-        Ray(origin=(15, 54), angle=2.827433388230814, dist=12),
-        Ray(origin=(15, 54), angle=3.141592653589793, dist=12),
-        Ray(origin=(15, 55), angle=2.827433388230814, dist=12),
-        Ray(origin=(15, 55), angle=2.5132741228718345, dist=12),
-        Ray(origin=(15, 55), angle=2.199114857512855, dist=12),
-        Ray(origin=(15, 56), angle=1.8849555921538759, dist=26),
-        Ray(origin=(15, 57), angle=1.5707963267948966, dist=25),
-        Ray(origin=(15, 57), angle=1.2566370614359172, dist=23),
-        Ray(origin=(15, 58), angle=0.9424777960769379, dist=23),
-        Ray(origin=(15, 59), angle=0.6283185307179586, dist=25),
-        Ray(origin=(15, 60), angle=0.3141592653589793, dist=29)]
+    # rays = [
+    #     Ray(origin=(15, 10), angle=1.2566370614359172, dist=31),
+    #     Ray(origin=(15, 10), angle=0.9424777960769379, dist=28),
+    #     Ray(origin=(15, 10), angle=0.6283185307179586, dist=36),
+    #     Ray(origin=(15, 10), angle=0.3141592653589793, dist=35),
+    #     Ray(origin=(15, 10), angle=0.0, dist=42),
+    #     Ray(origin=(15, 10), angle=0.3141592653589793, dist=50),
+    #     Ray(origin=(15, 10), angle=0.6283185307179586, dist=50),
+    #     Ray(origin=(15, 10), angle=0.9424777960769379, dist=38),
+    #     Ray(origin=(15, 10), angle=1.2566370614359172, dist=35),
+    #     Ray(origin=(15, 10), angle=1.5707963267948966, dist=32),
+    #     Ray(origin=(15, 10), angle=1.8849555921538759, dist=29),
+    #     Ray(origin=(15, 10), angle=2.199114857512855, dist=32),
+    #     Ray(origin=(15, 10), angle=2.5132741228718345, dist=33),
+    #     Ray(origin=(15, 10), angle=2.827433388230814, dist=29),
+    #     Ray(origin=(15, 10), angle=3.141592653589793, dist=33),
+    #     Ray(origin=(15, 10), angle=2.827433388230814, dist=39),
+    #     Ray(origin=(15, 12), angle=2.5132741228718345, dist=50),
+    #     Ray(origin=(15, 14), angle=2.199114857512855, dist=29),
+    #     Ray(origin=(15, 16), angle=1.8849555921538759, dist=27),
+    #     Ray(origin=(15, 17), angle=1.5707963267948966, dist=27),
+    #     Ray(origin=(15, 18), angle=1.2566370614359172, dist=28),
+    #     Ray(origin=(15, 19), angle=0.9424777960769379, dist=28),
+    #     Ray(origin=(15, 20), angle=0.6283185307179586, dist=27),
+    #     Ray(origin=(15, 21), angle=0.3141592653589793, dist=26),
+    #     Ray(origin=(15, 22), angle=0.0, dist=29),
+    #     Ray(origin=(15, 23), angle=0.3141592653589793, dist=50),
+    #     Ray(origin=(15, 24), angle=0.6283185307179586, dist=44),
+    #     Ray(origin=(15, 26), angle=0.9424777960769379, dist=20),
+    #     Ray(origin=(15, 28), angle=1.2566370614359172, dist=19),
+    #     Ray(origin=(15, 29), angle=1.5707963267948966, dist=20),
+    #     Ray(origin=(15, 30), angle=1.8849555921538759, dist=29),
+    #     Ray(origin=(15, 30), angle=2.199114857512855, dist=31),
+    #     Ray(origin=(15, 32), angle=2.5132741228718345, dist=30),
+    #     Ray(origin=(15, 33), angle=2.827433388230814, dist=32),
+    #     Ray(origin=(15, 34), angle=3.141592653589793, dist=29),
+    #     Ray(origin=(15, 35), angle=2.827433388230814, dist=64),
+    #     Ray(origin=(15, 37), angle=2.5132741228718345, dist=33),
+    #     Ray(origin=(15, 40), angle=2.199114857512855, dist=22),
+    #     Ray(origin=(15, 41), angle=1.8849555921538759, dist=22),
+    #     Ray(origin=(15, 42), angle=1.5707963267948966, dist=27),
+    #     Ray(origin=(15, 42), angle=1.2566370614359172, dist=28),
+    #     Ray(origin=(15, 43), angle=0.9424777960769379, dist=18),
+    #     Ray(origin=(15, 44), angle=0.6283185307179586, dist=17),
+    #     Ray(origin=(15, 45), angle=0.3141592653589793, dist=16),
+    #     Ray(origin=(15, 45), angle=0.0, dist=25),
+    #     Ray(origin=(15, 46), angle=0.3141592653589793, dist=50),
+    #     Ray(origin=(15, 47), angle=0.6283185307179586, dist=15),
+    #     Ray(origin=(15, 48), angle=0.9424777960769379, dist=13),
+    #     Ray(origin=(15, 49), angle=1.2566370614359172, dist=28),
+    #     Ray(origin=(15, 50), angle=1.5707963267948966, dist=32),
+    #     Ray(origin=(15, 51), angle=1.8849555921538759, dist=29),
+    #     Ray(origin=(15, 51), angle=2.199114857512855, dist=28),
+    #     Ray(origin=(15, 53), angle=2.5132741228718345, dist=14),
+    #     Ray(origin=(15, 54), angle=2.827433388230814, dist=12),
+    #     Ray(origin=(15, 54), angle=3.141592653589793, dist=12),
+    #     Ray(origin=(15, 55), angle=2.827433388230814, dist=12),
+    #     Ray(origin=(15, 55), angle=2.5132741228718345, dist=12),
+    #     Ray(origin=(15, 55), angle=2.199114857512855, dist=12),
+    #     Ray(origin=(15, 56), angle=1.8849555921538759, dist=26),
+    #     Ray(origin=(15, 57), angle=1.5707963267948966, dist=25),
+    #     Ray(origin=(15, 57), angle=1.2566370614359172, dist=23),
+    #     Ray(origin=(15, 58), angle=0.9424777960769379, dist=23),
+    #     Ray(origin=(15, 59), angle=0.6283185307179586, dist=25),
+    #     Ray(origin=(15, 60), angle=0.3141592653589793, dist=29)]
 
-    rays = [Ray(origin=(100, 10), angle=1.2566370614359172, dist=29), Ray(origin=(100, 10), angle=0.9424777960769379, dist=28), Ray(origin=(100, 10), angle=0.6283185307179586, dist=30), Ray(origin=(100, 10), angle=0.3141592653589793, dist=65), Ray(origin=(100, 10), angle=0.0, dist=50), Ray(origin=(100, 10), angle=0.3141592653589793, dist=50), Ray(origin=(100, 10), angle=0.6283185307179586, dist=50), Ray(origin=(100, 10), angle=0.9424777960769379, dist=50), Ray(origin=(100, 10), angle=1.2566370614359172, dist=32), Ray(origin=(100, 10), angle=1.5707963267948966, dist=33), Ray(origin=(100, 10), angle=1.8849555921538759, dist=50), Ray(origin=(100, 10), angle=2.199114857512855, dist=34), Ray(origin=(100, 10), angle=2.5132741228718345, dist=28), Ray(origin=(100, 10), angle=2.827433388230814, dist=28), Ray(origin=(100, 10), angle=3.141592653589793, dist=30), Ray(origin=(100, 10), angle=2.827433388230814, dist=50), Ray(origin=(100, 12), angle=2.5132741228718345, dist=29), Ray(origin=(100, 13), angle=2.199114857512855, dist=26), Ray(origin=(100, 15), angle=1.8849555921538759, dist=25), Ray(origin=(100, 16), angle=1.5707963267948966, dist=40), Ray(origin=(100, 17), angle=1.2566370614359172, dist=42), Ray(origin=(100, 18), angle=0.9424777960769379, dist=28), Ray(origin=(100, 19), angle=0.6283185307179586, dist=21), Ray(origin=(100, 20), angle=0.3141592653589793, dist=22), Ray(origin=(100, 21), angle=0.0, dist=49), Ray(origin=(100, 22), angle=0.3141592653589793, dist=50), Ray(origin=(100, 24), angle=0.6283185307179586, dist=20), Ray(origin=(100, 25), angle=0.9424777960769379, dist=18), Ray(origin=(100, 26), angle=1.2566370614359172, dist=30), Ray(origin=(
-        100, 27), angle=1.5707963267948966, dist=29), Ray(origin=(100, 28), angle=1.8849555921538759, dist=31), Ray(origin=(100, 28), angle=2.199114857512855, dist=29), Ray(origin=(100, 30), angle=2.5132741228718345, dist=32), Ray(origin=(100, 31), angle=2.827433388230814, dist=27), Ray(origin=(100, 32), angle=3.141592653589793, dist=31), Ray(origin=(100, 33), angle=2.827433388230814, dist=50), Ray(origin=(100, 34), angle=2.5132741228718345, dist=51), Ray(origin=(100, 37), angle=2.199114857512855, dist=19), Ray(origin=(100, 39), angle=1.8849555921538759, dist=21), Ray(origin=(100, 40), angle=1.5707963267948966, dist=25), Ray(origin=(100, 40), angle=1.2566370614359172, dist=35), Ray(origin=(100, 42), angle=0.9424777960769379, dist=37), Ray(origin=(100, 43), angle=0.6283185307179586, dist=55), Ray(origin=(100, 46), angle=0.3141592653589793, dist=12), Ray(origin=(100, 47), angle=0.0, dist=10), Ray(origin=(100, 48), angle=0.3141592653589793, dist=11), Ray(origin=(100, 48), angle=0.6283185307179586, dist=10), Ray(origin=(100, 48), angle=0.9424777960769379, dist=15), Ray(origin=(100, 49), angle=1.2566370614359172, dist=32), Ray(origin=(100, 50), angle=1.5707963267948966, dist=27), Ray(origin=(100, 51), angle=1.8849555921538759, dist=25), Ray(origin=(100, 51), angle=2.199114857512855, dist=25), Ray(origin=(100, 52), angle=2.5132741228718345, dist=44), Ray(origin=(100, 54), angle=2.827433388230814, dist=32), Ray(origin=(100, 56), angle=3.141592653589793, dist=18), Ray(origin=(100, 57), angle=2.827433388230814, dist=17), Ray(origin=(100, 58), angle=2.5132741228718345, dist=17), Ray(origin=(100, 58), angle=2.199114857512855, dist=29), Ray(origin=(100, 59), angle=1.8849555921538759, dist=30)]
+    # rays = [Ray(origin=(100, 10), angle=1.2566370614359172, dist=29), Ray(origin=(100, 10), angle=0.9424777960769379, dist=28), Ray(origin=(100, 10), angle=0.6283185307179586, dist=30), Ray(origin=(100, 10), angle=0.3141592653589793, dist=65), Ray(origin=(100, 10), angle=0.0, dist=50), Ray(origin=(100, 10), angle=0.3141592653589793, dist=50), Ray(origin=(100, 10), angle=0.6283185307179586, dist=50), Ray(origin=(100, 10), angle=0.9424777960769379, dist=50), Ray(origin=(100, 10), angle=1.2566370614359172, dist=32), Ray(origin=(100, 10), angle=1.5707963267948966, dist=33), Ray(origin=(100, 10), angle=1.8849555921538759, dist=50), Ray(origin=(100, 10), angle=2.199114857512855, dist=34), Ray(origin=(100, 10), angle=2.5132741228718345, dist=28), Ray(origin=(100, 10), angle=2.827433388230814, dist=28), Ray(origin=(100, 10), angle=3.141592653589793, dist=30), Ray(origin=(100, 10), angle=2.827433388230814, dist=50), Ray(origin=(100, 12), angle=2.5132741228718345, dist=29), Ray(origin=(100, 13), angle=2.199114857512855, dist=26), Ray(origin=(100, 15), angle=1.8849555921538759, dist=25), Ray(origin=(100, 16), angle=1.5707963267948966, dist=40), Ray(origin=(100, 17), angle=1.2566370614359172, dist=42), Ray(origin=(100, 18), angle=0.9424777960769379, dist=28), Ray(origin=(100, 19), angle=0.6283185307179586, dist=21), Ray(origin=(100, 20), angle=0.3141592653589793, dist=22), Ray(origin=(100, 21), angle=0.0, dist=49), Ray(origin=(100, 22), angle=0.3141592653589793, dist=50), Ray(origin=(100, 24), angle=0.6283185307179586, dist=20), Ray(origin=(100, 25), angle=0.9424777960769379, dist=18), Ray(origin=(100, 26), angle=1.2566370614359172, dist=30), Ray(origin=(
+    #     100, 27), angle=1.5707963267948966, dist=29), Ray(origin=(100, 28), angle=1.8849555921538759, dist=31), Ray(origin=(100, 28), angle=2.199114857512855, dist=29), Ray(origin=(100, 30), angle=2.5132741228718345, dist=32), Ray(origin=(100, 31), angle=2.827433388230814, dist=27), Ray(origin=(100, 32), angle=3.141592653589793, dist=31), Ray(origin=(100, 33), angle=2.827433388230814, dist=50), Ray(origin=(100, 34), angle=2.5132741228718345, dist=51), Ray(origin=(100, 37), angle=2.199114857512855, dist=19), Ray(origin=(100, 39), angle=1.8849555921538759, dist=21), Ray(origin=(100, 40), angle=1.5707963267948966, dist=25), Ray(origin=(100, 40), angle=1.2566370614359172, dist=35), Ray(origin=(100, 42), angle=0.9424777960769379, dist=37), Ray(origin=(100, 43), angle=0.6283185307179586, dist=55), Ray(origin=(100, 46), angle=0.3141592653589793, dist=12), Ray(origin=(100, 47), angle=0.0, dist=10), Ray(origin=(100, 48), angle=0.3141592653589793, dist=11), Ray(origin=(100, 48), angle=0.6283185307179586, dist=10), Ray(origin=(100, 48), angle=0.9424777960769379, dist=15), Ray(origin=(100, 49), angle=1.2566370614359172, dist=32), Ray(origin=(100, 50), angle=1.5707963267948966, dist=27), Ray(origin=(100, 51), angle=1.8849555921538759, dist=25), Ray(origin=(100, 51), angle=2.199114857512855, dist=25), Ray(origin=(100, 52), angle=2.5132741228718345, dist=44), Ray(origin=(100, 54), angle=2.827433388230814, dist=32), Ray(origin=(100, 56), angle=3.141592653589793, dist=18), Ray(origin=(100, 57), angle=2.827433388230814, dist=17), Ray(origin=(100, 58), angle=2.5132741228718345, dist=17), Ray(origin=(100, 58), angle=2.199114857512855, dist=29), Ray(origin=(100, 59), angle=1.8849555921538759, dist=30)]
 
-    mapper = Mapper(100, dist_cutoff=25, connect_cutoff=25)
-    for i, ray in enumerate(rays):
-        ray = Ray(
-            (ray.origin[0] - 50, 10 + (ray.origin[1] - 10) * 2),
-            ray.angle,
-            ray.dist / 2
-        )
-        mapper.add_ray(ray)
+    # mapper = Mapper(100, dist_cutoff=25, connect_cutoff=25)
+    # for i, ray in enumerate(rays):
+    #     ray = Ray(
+    #         (ray.origin[0] - 50, 10 + (ray.origin[1] - 10) * 2),
+    #         ray.angle,
+    #         ray.dist / 2
+    #     )
+    #     mapper.add_ray(ray)
 
-        # if i % 5 == 0:
-        mapper.plot()
+    #     # if i % 5 == 0:
+    #     mapper.plot()
+
+    # mapper = Mapper(60, 20, 20)
+    # with open("./map-1676358884.1629941.npy", "rb") as f:
+    #     mapper.data = np.load(f)[20:80, 45:105]
+    # mapper.plot(None)
+
+    # path = mapper.route((35, 0), (35, 40))
+    # print(path)
+    # mapper.plot(path)
+
+    # mapper.data = mapper.data == Mapper.FILLED
+    # mapper.plot(path)
+    pass
