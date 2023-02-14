@@ -151,7 +151,7 @@ class Mapper:
 
     def route(self, start: Tuple[int, int], dest: Tuple[int, int]) -> List[Tuple[int, int]]:
         """Find a route from start to dest"""
-        return astar(self.data == self.FILLED, start, dest)
+        return astar((self.data == self.FILLED).astype(int), start, dest)
 
 
 if __name__ == '__main__':
