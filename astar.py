@@ -1,14 +1,18 @@
 import heapq
 import numpy as np
 
+
 def astar(array, begin, dest):
+    print(array.sum())
+    print(array)
     """
     set array coming from map.data,whihc is two 2d array.
     """
-    begin = tuple(begin)   
-    dest = tuple(dest)   
+    begin = tuple(begin)
+    dest = tuple(dest)
 
-    neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+    neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0),
+                 (1, 1), (1, -1), (-1, 1), (-1, -1)]
 
     openlist = []
     gc = {begin: 0}
@@ -50,7 +54,7 @@ def astar(array, begin, dest):
 
 
 def heur(a, b):
-    return (((a[0]-b[0])**2+(a[1]- b[1])**2)) ** 0.5
+    return (((a[0]-b[0])**2+(a[1] - b[1])**2)) ** 0.5
 
 
 # array = np.array([[0, 0, 0, 0],
@@ -66,12 +70,12 @@ def heur(a, b):
 
 
 array = np.array([[0, 0, 0, 0],
-                [1, 0, 1, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0]])
+                  [1, 1, 1, 0],
+                  [0, 0, 0, 0],
+                  [0, 0, 0, 0]])
 
 start = (0, 0)
-end = (3, 3)
+end = (3, 1)
 
 path = astar(array, start, end)
 print(path)
