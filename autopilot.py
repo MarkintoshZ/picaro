@@ -82,7 +82,7 @@ def main(object_detection: bool = False):
     while True:
         print("Scanning...")
         for _ in range(10):
-            radar.get_distance_at(0, sleep_duration=0.05)
+            radar.get_distance_at(0, sleep_duration=0.2)
             angle, dist = radar.scan_step()
             angle_in_rad = math.radians(-angle) + car.curr_dir
             angle_in_rad %= (2 * math.pi)
