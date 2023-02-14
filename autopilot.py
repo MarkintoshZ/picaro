@@ -74,14 +74,15 @@ def navigate(
 
 def main(object_detection: bool = False):
     radar = Radar()
-    mapper = Mapper(size=MAP_SIZE, dist_cutoff=10, connect_cutoff=10)
+    mapper = Mapper(size=MAP_SIZE, dist_cutoff=12, connect_cutoff=12)
     car = Car(position=(MAP_SIZE // 2, 25),
               dir_in_rad=math.radians(90))
 
     dest = (MAP_SIZE // 2, 80)
     while True:
         print("Scanning...")
-        for _ in range(15):
+        for _ in range(10):
+            radar.get_distance_at(0, sleep_duration=0.05)
             angle, dist = radar.scan_step()
             angle_in_rad = math.radians(-angle) + car.curr_dir
             angle_in_rad %= (2 * math.pi)
