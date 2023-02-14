@@ -46,7 +46,9 @@ def navigate(
         while True:
             curr_car_pos = car.get_position().round().astype(int)
             print(curr_car_pos, car.curr_dir)
-            if curr_car_pos[0] == waypoint[0] and curr_car_pos[1] == waypoint[1]:
+            dist = math.sqrt((curr_car_pos[0] - waypoint[0]) ** 2 +
+                             (curr_car_pos[1] - waypoint[1]) ** 2)
+            if dist < 1:
                 break
 
             for angle in range(-20, 20, 10):
