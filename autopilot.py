@@ -1,3 +1,5 @@
+from queue import Queue, Empty
+from threading import Thread
 import argparse
 import math
 import time
@@ -12,18 +14,17 @@ from common import Car, Radar
 MAP_SIZE = 150
 
 
+terminate_program = False
+
+
 def navigate(
     path: List[Tuple[int, int]],
     car: Car,
     radar: Radar,
-    object_detection: bool
+    queue: Queue,
 ) -> bool:
     """Attempt to navigate to the given path. Returns True if successful, False 
     otherwise"""
-    if object_detection:
-        from detect import run as detect
-        detector = detect("efficientdet_lite0.tflite", 0, 640, 480, 4, False)
-
     i = 0
     while i < len(path) - 1:
         curr_loc, next_loc = path[i], path[i+1]
@@ -53,28 +54,54 @@ def navigate(
                 break
             prev_dist = min(prev_dist, dist)
 
-            for angle in range(-20, 20, 10):
-                dist = radar.get_distance_at(angle, sleep_duration=0.04)
-                if dist < 10:
-                    # encountered obstacle, stop and return
-                    car.stop()
-                    return False
-
-            if object_detection:
-                has_stop_sign = next(detector)
-                if has_stop_sign:
+            stop_sign_detected = False
+            if queue is not None:
+                print("fetch queue...", end=' ')
+                has_stop_sign = None
+                while True:
+                    try:
+                        has_stop_sign = queue.get_nowait()
+                    except Empty:
+                        break
+                print('has stop sign =', has_stop_sign)
+                if has_stop_sign is not None and has_stop_sign is True:
+                    stop_sign_detected = True
                     car.stop()
                     time.sleep(3)
                     car.forward()
-            else:
-                time.sleep(0.05)
 
+            if not stop_sign_detected:
+                for angle in range(-20, 20, 10):
+                    dist = radar.get_distance_at(angle, sleep_duration=0.04)
+                    if dist < 10:
+                        # encountered obstacle, stop and return
+                        car.stop()
+                        return False
         car.stop()
 
     return True
 
 
+def object_detection_cv(queue: Queue):
+    global terminate_program
+
+    from detect import run as detect
+    detector = detect("efficientdet_lite0.tflite", 0, 640, 480, 4, False)
+    for has_stop_sign in detector:
+        queue.put(has_stop_sign)
+        if terminate_program:
+            break
+
+
 def main(object_detection: bool = False):
+    global terminate_program
+
+    queue = Queue()
+
+    thread: Thread
+    if object_detection:
+        thread = Thread(target=object_detection_cv, args=(queue,)).start()
+
     radar = Radar()
     mapper = Mapper(size=MAP_SIZE, dist_cutoff=20, connect_cutoff=20)
     car = Car(position=(MAP_SIZE // 2, 25),
@@ -97,9 +124,12 @@ def main(object_detection: bool = False):
             print("No path found!")
             return
         print("Following path...")
-        if navigate(path, car, radar, object_detection):
+        if navigate(path, car, radar, queue):
             break
     print("Reached destination!")
+
+    terminate_program = True
+    thread.join()
 
 
 if __name__ == '__main__':
