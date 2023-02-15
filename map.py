@@ -1,6 +1,7 @@
 from typing import Union, List, NamedTuple, Tuple
 
 import numpy as np
+from scipy.ndimage.filters import gaussian_filter
 
 from astar import astar
 
@@ -152,7 +153,10 @@ class Mapper:
 
     def route(self, start: Tuple[int, int], dest: Tuple[int, int]) -> List[Tuple[int, int]]:
         """Find a route from start to dest"""
-        return astar((self.data == self.FILLED).astype(int).T, start, dest)
+        obstacle_map = (self.data == self.FILLED).astype(float)
+        blurred = gaussian_filter(obstacle_map, sigma=5)
+        extruded = (blurred > 0).astype(int)
+        return astar(extruded.T, start, dest)
 
 
 if __name__ == '__main__':
