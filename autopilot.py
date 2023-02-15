@@ -15,6 +15,7 @@ MAP_SIZE = 150
 
 
 terminate_program = False
+ignore_stop_sign = False
 
 
 def navigate(
@@ -64,7 +65,9 @@ def navigate(
                     except Empty:
                         break
                 print('has stop sign =', has_stop_sign)
-                if has_stop_sign is not None and has_stop_sign is True:
+                if has_stop_sign is not None and has_stop_sign is True and \
+                        not ignore_stop_sign:
+                    ignore_stop_sign = True
                     stop_sign_detected = True
                     car.stop()
                     time.sleep(3)
