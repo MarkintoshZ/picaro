@@ -94,8 +94,9 @@ def object_detection_cv(queue: Queue):
     detector = detect("efficientdet_lite0.tflite", 0, 640, 480, 4, False)
     for has_stop_sign in detector:
         queue.put(has_stop_sign)
-        if terminate_program:
+        if terminate_program or ignore_stop_sign:
             break
+        time.sleep(0.5)
 
 
 def main(object_detection: bool = False):
