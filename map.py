@@ -156,6 +156,9 @@ class Mapper:
         obstacle_map = (self.data == self.FILLED).astype(float)
         blurred = gaussian_filter(obstacle_map, sigma=1)
         extruded = (blurred > 0.001).astype(int)
+        import matplotlib.pyplot as plt
+        plt.polcolormesh(extruded, cmap='Greys')
+        plt.show()
         return astar(extruded.T, start, dest)
 
 
