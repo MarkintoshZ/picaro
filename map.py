@@ -154,8 +154,8 @@ class Mapper:
     def route(self, start: Tuple[int, int], dest: Tuple[int, int]) -> List[Tuple[int, int]]:
         """Find a route from start to dest"""
         obstacle_map = (self.data == self.FILLED).astype(float)
-        blurred = gaussian_filter(obstacle_map, sigma=5)
-        extruded = (blurred > 0).astype(int)
+        blurred = gaussian_filter(obstacle_map, sigma=1)
+        extruded = (blurred > 0.001).astype(int)
         return astar(extruded.T, start, dest)
 
 
