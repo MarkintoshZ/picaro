@@ -11,7 +11,7 @@ from map import Mapper, Ray
 from common import Car, Radar
 
 
-MAP_SIZE = 150
+MAP_SIZE = 100
 
 
 terminate_program = False
@@ -113,7 +113,7 @@ def main(object_detection: bool = False):
     car = Car(position=(MAP_SIZE // 2, 25),
               dir_in_rad=math.radians(90))
 
-    dest = (MAP_SIZE // 2, 80)
+    dest = (MAP_SIZE // 2, 60)
     while True:
         print("Scanning...")
         for _ in range(15):
