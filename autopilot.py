@@ -43,13 +43,15 @@ def navigate(
         car.turn_absolute(dir_in_rad)
         car.forward()
 
+        prev_dist = math.inf
         while True:
             curr_car_pos = car.get_position().round().astype(int)
             print(curr_car_pos, car.curr_dir)
             dist = math.sqrt((curr_car_pos[0] - waypoint[0]) ** 2 +
                              (curr_car_pos[1] - waypoint[1]) ** 2)
-            if dist < 1:
+            if prev_dist < dist:
                 break
+            prev_dist = min(prev_dist, dist)
 
             for angle in range(-20, 20, 10):
                 dist = radar.get_distance_at(angle, sleep_duration=0.04)
@@ -81,8 +83,7 @@ def main(object_detection: bool = False):
     dest = (MAP_SIZE // 2, 80)
     while True:
         print("Scanning...")
-        for _ in range(10):
-            radar.get_distance_at(0, sleep_duration=0.2)
+        for _ in range(15):
             angle, dist = radar.scan_step()
             angle_in_rad = math.radians(-angle) + car.curr_dir
             angle_in_rad %= (2 * math.pi)
