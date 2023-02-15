@@ -153,13 +153,14 @@ class Mapper:
 
     def route(self, start: Tuple[int, int], dest: Tuple[int, int]) -> List[Tuple[int, int]]:
         """Find a route from start to dest"""
-        obstacle_map = (self.data == self.FILLED).astype(float)
-        blurred = gaussian_filter(obstacle_map, sigma=1)
-        extruded = (blurred > 0.001).astype(int)
-        import matplotlib.pyplot as plt
-        plt.pcolormesh(extruded, cmap='Greys')
-        plt.show()
-        return astar(extruded.T, start, dest)
+        # obstacle_map = (self.data == self.FILLED).astype(float)
+        # blurred = gaussian_filter(obstacle_map, sigma=1)
+        # extruded = (blurred > 0.001).astype(int)
+        # import matplotlib.pyplot as plt
+        # plt.pcolormesh(extruded, cmap='Greys')
+        # plt.show()
+        # return astar(extruded.T, start, dest)
+        return astar((self.data == self.FILLED).astype(int).T, start, dest)
 
 
 if __name__ == '__main__':
