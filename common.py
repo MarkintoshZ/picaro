@@ -60,7 +60,7 @@ class Radar:
 class Car:
     """Control the pi car movement while keeping track of position and direction"""
     _SPEED = 5
-    _SPEED_SCALER = 1 / 2
+    _SPEED_SCALER = 1
     _TURN_SCALER = (17 / 15) / (2 * math.pi)
 
     def __init__(self, position: Iterable, dir_in_rad: float):
