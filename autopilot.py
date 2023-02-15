@@ -26,6 +26,8 @@ def navigate(
 ) -> bool:
     """Attempt to navigate to the given path. Returns True if successful, False 
     otherwise"""
+    global ignore_stop_sign
+
     i = 0
     while i < len(path) - 1:
         curr_loc, next_loc = path[i], path[i+1]
