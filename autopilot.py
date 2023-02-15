@@ -109,7 +109,7 @@ def main(object_detection: bool = False):
         thread = Thread(target=object_detection_cv, args=(queue,)).start()
 
     radar = Radar()
-    mapper = Mapper(size=MAP_SIZE, dist_cutoff=20, connect_cutoff=20)
+    mapper = Mapper(size=MAP_SIZE, dist_cutoff=10, connect_cutoff=10)
     car = Car(position=(MAP_SIZE // 2, 25),
               dir_in_rad=math.radians(90))
 
