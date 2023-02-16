@@ -110,11 +110,11 @@ def main(object_detection: bool = False):
         thread = Thread(target=object_detection_cv, args=(queue,)).start()
 
     radar = Radar()
-    mapper = Mapper(size=MAP_SIZE, dist_cutoff=8, connect_cutoff=8)
-    car = Car(position=(MAP_SIZE // 2, 15),
+    mapper = Mapper(size=MAP_SIZE, dist_cutoff=10, connect_cutoff=10)
+    car = Car(position=(MAP_SIZE // 2, 20),
               dir_in_rad=math.radians(90))
 
-    dest = (MAP_SIZE // 2, 60)
+    dest = (MAP_SIZE // 2, 50)
     while True:
         print("Scanning...")
         for _ in range(15):
