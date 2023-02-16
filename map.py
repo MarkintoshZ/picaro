@@ -155,7 +155,8 @@ class Mapper:
         """Find a route from start to dest"""
         obstacle_map = (self.data == self.FILLED).astype(float)
         blurred = gaussian_filter(obstacle_map, sigma=1)
-        extruded = (blurred > 0.01).astype(int)
+        threshold = blurred[start[1], start[0]]
+        extruded = (blurred >= max(threshold, 0.01)).astype(int)
         import matplotlib.pyplot as plt
         plt.pcolormesh(extruded, cmap='Greys')
         plt.show()
