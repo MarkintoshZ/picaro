@@ -36,9 +36,6 @@ class Radar:
             self.current_angle = min_angle
             self.step_direction = -self.step_direction
         dist = self.get_distance_at(self.current_angle, sleep_duration=0.1)
-        if dist < 0:
-            dist = 100
-
         return self.current_angle, dist
 
     def get_distance_at(self, angle: float, sleep_duration: float = 0.04) -> float:
@@ -54,6 +51,9 @@ class Radar:
         self.servo.set_angle(angle)
         time.sleep(sleep_duration)
         distance = fc.us.get_distance()
+        if distance < 0:
+            distance = 100
+
         return distance
 
 
