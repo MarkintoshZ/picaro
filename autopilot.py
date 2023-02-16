@@ -50,7 +50,7 @@ def navigate(
         prev_dist = math.inf
         while True:
             curr_car_pos = car.get_position().round().astype(int)
-            print(curr_car_pos, car.curr_dir)
+            print(curr_car_pos, car.curr_dir, waypoint)
             dist = math.sqrt((curr_car_pos[0] - waypoint[0]) ** 2 +
                              (curr_car_pos[1] - waypoint[1]) ** 2)
             if prev_dist < dist:
@@ -76,10 +76,12 @@ def navigate(
                     car.forward()
 
             if not stop_sign_detected:
+                dist = radar.get_distance_at(0, sleep_duration=0.25)
                 for angle in range(-20, 20, 10):
-                    dist = radar.get_distance_at(angle, sleep_duration=0.04)
+                    dist = radar.get_distance_at(angle, sleep_duration=0.05)
                     if dist < 10:
-                        # encountered obstacle, stop and return
+                        print("Angle: ", angle, "Distance: ", dist)
+                        print("encountered obstacle, stop and return")
                         car.stop()
                         return False
         car.stop()
