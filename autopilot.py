@@ -11,7 +11,7 @@ from map import Mapper, Ray
 from common import Car, Radar
 
 
-MAP_SIZE = 80
+MAP_SIZE = 60
 
 
 terminate_program = False
@@ -124,7 +124,7 @@ def main(object_detection: bool = False):
             angle_in_rad = math.radians(-angle) + car.curr_dir
             angle_in_rad %= (2 * math.pi)
             position = car.get_position().round().astype(int)
-            ray = Ray(tuple(position), angle_in_rad, round(dist / 5))
+            ray = Ray(tuple(position), angle_in_rad, round(dist / 7))
             mapper.add_ray(ray)
         print("Finding path...")
         path = mapper.route(car.get_position().round().astype(int), dest)
